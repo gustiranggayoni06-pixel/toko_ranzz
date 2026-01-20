@@ -61,7 +61,7 @@
 
         /* AI Chat Box */
         #ai-chat {
-            position: fixed; bottom: 100px; right: 30px; width: 320px; height: 450px;
+            position: fixed; bottom: 100px; right: 30px; width: 320px; height: 500px;
             background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(125,125,125,0.2);
             display: none; flex-direction: column; z-index: 2000; overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -70,8 +70,12 @@
         .chat-header { background: var(--primary); padding: 15px; color: white; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
         #chat-content { flex: 1; padding: 15px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px; }
         
-        .msg-ai { background: var(--bg); padding: 10px; border-radius: 0 15px 15px 15px; align-self: flex-start; max-width: 85%; border: 1px solid rgba(125,125,125,0.1); }
+        .msg-ai { background: var(--bg); padding: 10px; border-radius: 0 15px 15px 15px; align-self: flex-start; max-width: 85%; border: 1px solid rgba(125,125,125,0.1); line-height: 1.4; }
         .msg-user { background: var(--primary); color: white; padding: 10px; border-radius: 15px 15px 0 15px; align-self: flex-end; max-width: 85%; }
+
+        /* Quick Buttons AI */
+        .quick-box { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; background: var(--card-bg); border-top: 1px solid rgba(125,125,125,0.1); }
+        .q-btn { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--primary); color: var(--primary); padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; }
 
         .chat-input { display: flex; padding: 12px; background: var(--bg); gap: 8px; }
         .chat-input input { flex: 1; padding: 10px; border-radius: 10px; border: none; outline: none; background: var(--card-bg); color: var(--text-main); }
@@ -112,7 +116,7 @@
 
     <header class="hero">
         <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">SYSTEM PRO JB</h1>
-        <p style="color: var(--text-sub);">Modern Digital Store & AI Assistant</p>
+        <p style="color: var(--text-sub);">Platform Jual Beli Akun Digital & Top Up</p>
     </header>
 
     <main class="container">
@@ -129,12 +133,20 @@
     <div id="ai-btn" onclick="toggleChat()">🤖</div>
     <div id="ai-chat">
         <div class="chat-header">
-            <span>RANZZ-AI ASSISTANT</span>
+            <span>RANZZ-AI HELP CENTER</span>
             <span onclick="toggleChat()" style="cursor:pointer; font-size: 1.5rem;">&times;</span>
         </div>
         <div id="chat-content">
-            <div class="msg-ai">Halo! Saya asisten RANZZ_JB. Silakan tanya apa saja tentang toko kami! ✨</div>
+            <div class="msg-ai">Halo! Saya RANZZ-AI. Ada yang bisa saya bantu terkait transaksi atau layanan kami? ✨</div>
         </div>
+        
+        <div class="quick-box">
+            <div class="q-btn" onclick="askQuick('Bagaimana cara bayar?')">💳 Cara Bayar</div>
+            <div class="q-btn" onclick="askQuick('Apakah aman beli di sini?')">🛡️ Keamanan</div>
+            <div class="q-btn" onclick="askQuick('Berapa lama akun dikirim?')">⚡ Pengiriman</div>
+            <div class="q-btn" onclick="askQuick('Metode pembayaran apa saja?')">💰 Metode</div>
+        </div>
+
         <div class="chat-input">
             <input type="text" id="ai-input" placeholder="Tanya sesuatu..." onkeypress="if(event.key === 'Enter') askAI()">
             <button onclick="askAI()">Kirim</button>
@@ -226,7 +238,7 @@
             }
         }
 
-        // AI SESSION LOGIC v2
+        // AI LOGIC v2.1 (Digital Knowledge)
         function toggleChat() {
             const chat = document.getElementById('ai-chat');
             chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
@@ -241,6 +253,11 @@
             content.scrollTop = content.scrollHeight;
         }
 
+        function askQuick(text) {
+            document.getElementById('ai-input').value = text;
+            askAI();
+        }
+
         function askAI() {
             const input = document.getElementById('ai-input');
             const userMsg = input.value.trim();
@@ -249,23 +266,22 @@
             addChatMessage('user', userMsg);
             input.value = "";
 
-            // Simulasi AI Sedang Berpikir
             setTimeout(() => {
                 const lowMsg = userMsg.toLowerCase();
-                let response = "Saya asisten pintar RANZZ. Saya belum mengerti maksud Anda, coba tanya tentang 'cara beli', 'aman', atau 'produk'.";
+                let response = "Mohon maaf, saya belum memahami pertanyaan tersebut. Bisa coba tanyakan tentang 'pembayaran', 'garansi', atau 'cara order'?";
 
-                if(lowMsg.includes("halo") || lowMsg.includes("p")) {
-                    response = "Halo! Senang bertemu Anda. Ada yang bisa saya bantu di toko RANZZ_JB?";
+                if(lowMsg.includes("bayar") || lowMsg.includes("pembayaran")) {
+                    response = "Untuk pembayaran, kami menerima:\n1. DANA/OVO/GoPay\n2. Transfer Bank (BCA/BRI)\n3. QRIS (Semua Bank/E-Wallet).\nSilakan pilih produk dan klik tombol beli!";
                 } else if(lowMsg.includes("cara beli") || lowMsg.includes("order")) {
-                    response = "Caranya mudah! Klik tombol 'Beli Sekarang' pada produk yang Anda suka, lalu Anda akan diarahkan ke Gmail Admin untuk transaksi aman.";
-                } else if(lowMsg.includes("aman") || lowMsg.includes("legal")) {
-                    response = "Tentu saja! Semua akun di RANZZ_JB bergaransi dan legal. Kami mengutamakan kepercayaan pelanggan.";
-                } else if(lowMsg.includes("harga") || lowMsg.includes("murah")) {
-                    response = "Kami menyediakan produk berkualitas dengan harga bersaing, mulai dari puluhan ribu hingga ratusan ribu rupiah.";
-                } else if(lowMsg.includes("terima kasih") || lowMsg.includes("thanks")) {
-                    response = "Sama-sama! Jangan ragu bertanya lagi ya.";
-                } else if(lowMsg.includes("siapa") && lowMsg.includes("ranzz")) {
-                    response = "RANZZ adalah owner toko ini, seorang penyedia layanan digital terpercaya.";
+                    response = "1. Pilih akun yang diinginkan.\n2. Klik 'Beli Sekarang'.\n3. Kirim pesan ke Gmail Admin.\n4. Lakukan pembayaran.\n5. Akun akan langsung dikirim oleh admin.";
+                } else if(lowMsg.includes("aman") || lowMsg.includes("garansi") || lowMsg.includes("legal")) {
+                    response = "Tentu! Semua akun kami 100% legal dan bergaransi selama 30 hari jika terjadi masalah (bukan kesalahan buyer). Kami adalah toko terverifikasi.";
+                } else if(lowMsg.includes("berapa lama") || lowMsg.includes("pengiriman") || lowMsg.includes("kapan")) {
+                    response = "Pengiriman sangat cepat! Setelah bukti pembayaran dikirim, admin akan memproses data akun dalam waktu 5-15 menit.";
+                } else if(lowMsg.includes("halo") || lowMsg.includes("p")) {
+                    response = "Halo! Saya asisten RANZZ_JB. Ada yang bisa dibantu mengenai pembayaran atau detail akun?";
+                } else if(lowMsg.includes("diskon") || lowMsg.includes("murah")) {
+                    response = "Kami sering mengadakan promo! Cek berkala halaman ini atau tanyakan langsung ke admin untuk harga spesial pembelian pertama.";
                 }
 
                 addChatMessage('ai', response);
@@ -294,7 +310,7 @@
         function orderViaGmail(p, pr) {
             const user = localStorage.getItem('isLoggedIn');
             if(!user) return openAuth();
-            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=User: ${user} ingin membeli ${p} seharga ${pr}. Mohon diproses admin.`;
+            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=User: ${user} ingin membeli ${p} seharga ${pr}. Mohon instruksi pembayaran admin.`;
         }
 
         window.onload = async () => {
