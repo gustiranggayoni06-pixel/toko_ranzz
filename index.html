@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RANZZ_JB - Modern System</title>
+    <title>RANZZ_JB - Pro System</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <style>
-        /* Variabel Warna untuk Dark & Light Mode */
         :root {
             --primary: #6366f1;
             --danger: #ff4d4d;
@@ -30,21 +29,21 @@
             --nav-bg: rgba(255, 255, 255, 0.8);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.4s, color 0.4s; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); overflow-x: hidden; }
 
         /* Notifikasi */
         #custom-alert {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            padding: 15px 30px; border-radius: 20px; z-index: 3000;
-            display: flex; align-items: center; gap: 12px; font-weight: 800;
-            backdrop-filter: blur(10px); opacity: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 12px 25px; border-radius: 15px; z-index: 4000;
+            display: flex; align-items: center; gap: 10px; font-weight: 700;
+            backdrop-filter: blur(10px); opacity: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         #custom-alert.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .alert-error { background: rgba(255, 77, 77, 0.2); border: 2px solid var(--danger); color: var(--danger); }
-        .alert-success { background: rgba(0, 255, 136, 0.2); border: 2px solid var(--success); color: var(--success); }
+        .alert-error { background: rgba(255, 77, 77, 0.2); border: 1px solid var(--danger); color: var(--danger); }
+        .alert-success { background: rgba(0, 255, 136, 0.2); border: 1px solid var(--success); color: var(--success); }
 
-        /* Navigation */
+        /* Navigasi */
         nav {
             position: fixed; top: 0; width: 100%; padding: 1rem 5%;
             background: var(--nav-bg); backdrop-filter: blur(15px);
@@ -52,101 +51,111 @@
             z-index: 1000; border-bottom: 1px solid rgba(125,125,125,0.1);
         }
 
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-
-        /* Theme Toggle Button */
-        .theme-toggle {
-            background: none; border: 2px solid var(--primary); color: var(--primary);
-            width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        /* AI Floating Button */
+        #ai-btn {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: var(--primary); border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 1.5rem;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 999;
         }
 
-        .hero { padding: 140px 5% 40px; text-align: center; }
-        .hero h1 { font-size: 2.8rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .container { max-width: 1200px; margin: 0 auto 100px; padding: 0 5%; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 40px; }
-
-        .product-card { 
-            background: var(--card-bg); border-radius: 24px; overflow: hidden; 
-            border: 1px solid rgba(125,125,125,0.1); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        /* AI Chat Box */
+        #ai-chat {
+            position: fixed; bottom: 100px; right: 30px; width: 300px; height: 400px;
+            background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(125,125,125,0.2);
+            display: none; flex-direction: column; z-index: 999; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        .product-img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 25px; }
 
-        .price-tag { font-size: 1.6rem; font-weight: 800; color: var(--primary); margin: 15px 0; }
+        .chat-header { background: var(--primary); padding: 15px; color: white; font-weight: 800; display: flex; justify-content: space-between; }
+        #chat-content { flex: 1; padding: 15px; overflow-y: auto; font-size: 0.9rem; }
+        .chat-input { display: flex; padding: 10px; background: var(--bg); }
+        .chat-input input { flex: 1; padding: 8px; border-radius: 8px; border: none; outline: none; background: var(--card-bg); color: var(--text-main); }
 
-        .btn-buy { 
-            width: 100%; padding: 15px; border-radius: 15px; border: none; 
-            background: var(--primary); color: white; font-weight: 800; 
-            cursor: pointer; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3); 
+        /* Modal Profile & Settings */
+        .modal-custom { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-box { background: var(--card-bg); padding: 30px; border-radius: 25px; width: 90%; max-width: 400px; border: 1px solid rgba(125,125,125,0.2); }
+        .modal-box input, .modal-box textarea { 
+            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; 
+            border: 1px solid rgba(125,125,125,0.2); background: var(--bg); color: var(--text-main); 
         }
-        .btn-buy:hover { transform: translateY(-3px); filter: brightness(1.1); }
-        .btn-buy:active { transform: scale(0.95); }
 
-        /* Modal Auth */
-        .modal-auth { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        .auth-box { background: var(--card-bg); padding: 40px 30px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(125,125,125,0.2); }
-        .auth-box h2 { color: var(--text-main); margin-bottom: 20px; }
-        .auth-box input { 
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; 
-            border: 1px solid rgba(125,125,125,0.3); background: var(--bg); color: var(--text-main); outline: none; 
-        }
-        
-        #auth-error-msg { color: var(--danger); font-size: 0.9rem; font-weight: 800; margin-bottom: 15px; display: none; }
+        .hero { padding: 120px 5% 40px; text-align: center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .product-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid rgba(125,125,125,0.1); }
+        .btn-buy { width: 100%; padding: 12px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
         .hidden { display: none; }
     </style>
 </head>
 <body data-theme="dark">
 
     <div id="custom-alert">
-        <span id="alert-icon"></span>
         <span id="alert-text"></span>
     </div>
 
     <nav>
-        <div style="font-size: 1.5rem; font-weight: 800; color: #818cf8;">RANZZ_JB</div>
-        <div class="nav-right">
-            <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
+        <div style="font-size: 1.3rem; font-weight: 800; color: #818cf8;">RANZZ_JB</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button onclick="toggleTheme()" id="theme-btn" style="background:none; border:none; font-size: 1.2rem; cursor:pointer;">🌙</button>
             <div id="nav-actions">
-                <button id="btn-login-init" onclick="openAuth()" style="background: var(--primary); color:white; border:none; padding: 10px 25px; border-radius: 12px; font-weight:800; cursor:pointer;">Login</button>
-                <div id="user-info" class="hidden">
-                    <span id="user-name" style="font-weight: 700;"></span>
-                    <button onclick="logout()" style="color: var(--danger); border:none; background:none; cursor:pointer; margin-left: 10px; font-weight:800;">Logout</button>
+                <button id="btn-login-init" onclick="openAuth()" style="background: var(--primary); color:white; border:none; padding: 8px 20px; border-radius: 10px; font-weight:800; cursor:pointer;">Login</button>
+                <div id="user-info" class="hidden" onclick="openProfile()" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(125,125,125,0.1); padding: 5px 12px; border-radius: 10px;">
+                    <span id="user-name" style="font-weight: 700; font-size: 0.9rem;"></span>
+                    <span>⚙️</span>
                 </div>
             </div>
         </div>
     </nav>
 
-    <section class="hero">
-        <h1>TOKO DIGITAL MODERN</h1>
-        <p style="color: var(--text-sub); margin-top: 10px;">Platform Top Up & Akun Terpercaya</p>
-    </section>
+    <header class="hero">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">SYSTEM PRO JB</h1>
+        <p style="color: var(--text-sub);">Modern Digital Store & AI Assistant</p>
+    </header>
 
     <main class="container">
         <div class="product-grid">
             <div class="product-card">
-                <img src="1000095806.jpg" class="product-img" onerror="this.src='https://via.placeholder.com/400x220?text=Efootball+Squad'">
-                <div class="card-body">
-                    <h3 style="margin-bottom: 5px;">Akun Football Mythic 3096</h3>
-                    <p style="color: var(--text-sub); font-size: 0.85rem;">Kekuatan Kolektif 3096 | Messi 101, De Bruyne 102</p>
-                    <div class="price-tag">Rp 200.000</div>
-                    <button class="btn-buy" onclick="orderViaGmail('Akun Football 3096', 'Rp 200.000')">Beli Sekarang</button>
-                </div>
+                <h3>Akun E-Football Mythic</h3>
+                <p style="color: var(--text-sub); margin: 10px 0;">Squad GG Messi 101 + Epic.</p>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--success); margin-bottom: 15px;">Rp 200k</div>
+                <button class="btn-buy" onclick="orderViaGmail('Akun Mythic', '200rb')">Beli Sekarang</button>
             </div>
-            </div>
+        </div>
     </main>
 
-    <div id="auth-modal" class="modal-auth hidden">
-        <div class="auth-box">
+    <div id="ai-btn" onclick="toggleChat()">🤖</div>
+    <div id="ai-chat">
+        <div class="chat-header"><span>RANZZ-AI</span><span onclick="toggleChat()" style="cursor:pointer;">×</span></div>
+        <div id="chat-content">Halo! Ada yang bisa saya bantu tentang produk di sini?</div>
+        <div class="chat-input">
+            <input type="text" id="ai-input" placeholder="Tanya sesuatu...">
+            <button onclick="askAI()" style="background:none; border:none; margin-left:5px; cursor:pointer;">➡️</button>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal-custom hidden">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 15px;">Pengaturan Profil</h2>
+            <label style="font-size: 0.8rem; color: var(--text-sub);">Bio / Status</label>
+            <textarea id="user-bio" rows="2" placeholder="Tulis sesuatu tentang kamu..."></textarea>
+            
+            <label style="font-size: 0.8rem; color: var(--text-sub); margin-top: 10px; display: block;">Ganti Password</label>
+            <input type="password" id="new-password" placeholder="Password Baru">
+            
+            <button class="btn-buy" onclick="saveSettings()" style="margin-top: 15px;">Simpan Perubahan</button>
+            <button onclick="logout()" style="width:100%; margin-top: 10px; padding: 10px; background:none; border:1px solid var(--danger); color:var(--danger); border-radius:12px; font-weight:700; cursor:pointer;">Keluar</button>
+            <button onclick="closeProfile()" style="margin-top: 10px; background:none; border:none; color:var(--text-sub); width:100%; cursor:pointer;">Tutup</button>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="modal-custom hidden">
+        <div class="modal-box">
             <h2 id="auth-title">Daftar Akun</h2>
-            <div id="auth-error-msg">GAGAL: Password Salah!</div>
             <input type="text" id="auth-user" placeholder="Username">
             <input type="password" id="auth-pass" placeholder="Password">
-            <button class="btn-buy" onclick="handleAuth()" style="margin-top: 10px;">Konfirmasi</button>
-            <p id="toggle-text" style="margin-top: 20px; font-size: 0.85rem; cursor: pointer; color: var(--text-sub);" onclick="toggleAuthMode()">Belum punya akun? Daftar</p>
-            <button onclick="closeAuth()" style="margin-top: 15px; background:none; border:none; color:var(--text-sub); cursor:pointer;">Batal</button>
+            <button class="btn-buy" onclick="handleAuth()">Konfirmasi</button>
+            <p style="margin-top: 15px; font-size: 0.8rem; cursor:pointer;" onclick="toggleAuthMode()" id="toggle-text">Punya akun? Login</p>
         </div>
     </div>
 
@@ -165,90 +174,110 @@
         const db = firebase.database();
         let authMode = 'register';
 
-        // THEME TOGGLE LOGIC
+        // THEME & ALERTS
         function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('theme-btn');
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                btn.innerText = '☀️';
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                btn.innerText = '🌙';
-                localStorage.setItem('theme', 'dark');
-            }
+            const current = document.body.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', target);
+            localStorage.setItem('theme', target);
         }
 
-        function showAlert(text, type = 'error') {
+        function showAlert(text, type='error') {
             const box = document.getElementById('custom-alert');
-            document.getElementById('alert-text').innerText = text;
-            document.getElementById('alert-icon').innerText = type === 'error' ? '❌' : '✅';
+            box.innerText = text;
             box.className = 'show alert-' + type;
             setTimeout(() => box.classList.remove('show'), 3000);
         }
 
+        // AUTH
+        function openAuth() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function toggleAuthMode() {
             authMode = authMode === 'register' ? 'login' : 'register';
-            document.getElementById('auth-title').innerText = authMode === 'register' ? 'Daftar Akun' : 'Login Akun';
-            document.getElementById('toggle-text').innerText = authMode === 'register' ? 'Sudah punya akun? Login' : 'Belum punya akun? Daftar';
+            document.getElementById('auth-title').innerText = authMode === 'register' ? 'Daftar' : 'Login';
         }
 
-        function openAuth() { document.getElementById('auth-modal').classList.remove('hidden'); }
-        function closeAuth() { document.getElementById('auth-modal').classList.add('hidden'); }
-
         async function handleAuth() {
-            const user = document.getElementById('auth-user').value.trim().toLowerCase();
+            const user = document.getElementById('auth-user').value.toLowerCase().trim();
             const pass = document.getElementById('auth-pass').value.trim();
-            if (!user || !pass) return showAlert("Data tidak boleh kosong!");
+            if(!user || !pass) return showAlert("Isi semua kolom!");
 
             const userRef = db.ref('users/' + user);
-            const snapshot = await userRef.once('value');
-            const userData = snapshot.val();
+            const snap = await userRef.once('value');
 
-            if (authMode === 'register') {
-                if (userData) {
-                    showAlert("Username sudah terdaftar!");
-                } else {
-                    await userRef.set({ password: btoa(pass) });
-                    showAlert("Berhasil Daftar!", "success");
-                    toggleAuthMode();
-                }
+            if(authMode === 'register') {
+                if(snap.val()) return showAlert("Username dipakai!");
+                await userRef.set({ password: btoa(pass), bio: "Member Baru Ranzz" });
+                showAlert("Berhasil Daftar!", "success");
+                toggleAuthMode();
             } else {
-                if (userData && atob(userData.password) === pass) {
+                const data = snap.val();
+                if(data && atob(data.password) === pass) {
                     localStorage.setItem('isLoggedIn', user);
-                    showAlert("Berhasil Login!", "success");
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showAlert("Username atau Password Salah!");
-                }
+                    location.reload();
+                } else showAlert("Salah Password!");
             }
         }
 
-        function orderViaGmail(pName, pPrice) {
-            const user = localStorage.getItem('isLoggedIn');
-            if (!user) return openAuth();
+        // AI LOGIC
+        function toggleChat() {
+            const chat = document.getElementById('ai-chat');
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        }
 
-            const adminEmail = "gustiranggayoni06@gmail.com";
-            const subject = encodeURIComponent(`ORDER BARU - ${pName}`);
-            const body = encodeURIComponent(`Halo Admin,\n\nSaya ingin membeli ${pName} seharga ${pPrice}.\nUsername: ${user}`);
-            window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+        function askAI() {
+            const input = document.getElementById('ai-input');
+            const content = document.getElementById('chat-content');
+            const val = input.value.toLowerCase();
+            
+            content.innerHTML += `<div style="text-align:right; margin:5px; color:var(--primary)"><b>Kamu:</b> ${input.value}</div>`;
+            
+            let reply = "Maaf, saya tidak mengerti. Coba tanya tentang 'harga', 'stok', atau 'admin'.";
+            if(val.includes("harga")) reply = "Harga produk mulai dari Rp 50.000 sampai Rp 1.000.000 tergantung spek akun.";
+            if(val.includes("admin")) reply = "Admin bisa dihubungi melalui tombol 'Beli' atau email: gustiranggayoni06@gmail.com";
+            if(val.includes("halo") || val.includes("p")) reply = "Halo! Saya RANZZ-AI. Mau tanya apa hari ini?";
+            
+            setTimeout(() => {
+                content.innerHTML += `<div style="margin:5px;"><b>AI:</b> ${reply}</div>`;
+                content.scrollTop = content.scrollHeight;
+            }, 500);
+            input.value = "";
+        }
+
+        // PROFILE & SETTINGS
+        function openProfile() { document.getElementById('profile-modal').classList.remove('hidden'); }
+        function closeProfile() { document.getElementById('profile-modal').classList.add('hidden'); }
+
+        async function saveSettings() {
+            const user = localStorage.getItem('isLoggedIn');
+            const newBio = document.getElementById('user-bio').value;
+            const newPass = document.getElementById('new-password').value;
+            
+            let updateData = { bio: newBio };
+            if(newPass) updateData.password = btoa(newPass);
+
+            await db.ref('users/' + user).update(updateData);
+            showAlert("Profil diperbarui!", "success");
+            setTimeout(closeProfile, 1000);
         }
 
         function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
 
-        window.onload = () => {
-            // Load Theme
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-btn').innerText = savedTheme === 'dark' ? '🌙' : '☀️';
-
-            // Check Login
+        function orderViaGmail(p, pr) {
             const user = localStorage.getItem('isLoggedIn');
-            if (user) {
+            if(!user) return openAuth();
+            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=User: ${user} ingin beli ${p} harga ${pr}`;
+        }
+
+        window.onload = async () => {
+            const user = localStorage.getItem('isLoggedIn');
+            if(user) {
                 document.getElementById('btn-login-init').classList.add('hidden');
                 document.getElementById('user-info').classList.remove('hidden');
-                document.getElementById('user-name').innerText = "Halo, " + user;
+                document.getElementById('user-name').innerText = user;
+                
+                // Load Bio user
+                const snap = await db.ref('users/' + user).once('value');
+                if(snap.val() && snap.val().bio) document.getElementById('user-bio').value = snap.val().bio;
             }
         }
     </script>
