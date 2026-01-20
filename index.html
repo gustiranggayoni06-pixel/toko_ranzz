@@ -90,8 +90,7 @@
 
     <section class="hero">
         <h1>TOKO DIGITAL MODERN</h1>
-        <p style="color: #94a3b8; margin-top: 10px;">Transaksi Otomatis via Gmail: <b>gustiranggayoni06@gmail.com</b></p>
-    </section>
+        </section>
 
     <main class="container">
         <div class="product-grid">
@@ -182,7 +181,6 @@
             }
         }
 
-        // FUNGSI TRANSAKSI GMAIL OTOMATIS
         function orderViaGmail(pName, pPrice) {
             const user = localStorage.getItem('isLoggedIn');
             if (!user) return openAuth();
@@ -200,7 +198,6 @@
                 `Mohon segera diproses. Terima kasih.`
             );
 
-            // Membuka aplikasi Gmail otomatis
             window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
         }
 
