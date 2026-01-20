@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RANZZ_JB - Modern System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --danger: #ff4d4d;
+            --success: #00ff88;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-white: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-white); user-select: none; }
+
+        /* Notifikasi Melayang Modern */
+        #custom-alert {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            padding: 15px 30px; border-radius: 20px; z-index: 3000;
+            display: flex; align-items: center; gap: 12px; font-weight: 800;
+            backdrop-filter: blur(10px); opacity: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        #custom-alert.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .alert-error { background: rgba(255, 77, 77, 0.2); border: 2px solid var(--danger); color: var(--danger); box-shadow: 0 0 15px var(--danger); }
+        .alert-success { background: rgba(0, 255, 136, 0.2); border: 2px solid var(--success); color: var(--success); box-shadow: 0 0 15px var(--success); }
+
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 1.2rem 5%;
+            background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(15px);
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hero { padding: 160px 5% 60px; text-align: center; }
+        .hero h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .container { max-width: 1200px; margin: 0 auto 100px; padding: 0 5%; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+
+        .product-card { background: var(--card-bg); border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .product-img { width: 100%; height: 220px; object-fit: cover; }
+        .card-body { padding: 25px; }
+
+        .btn-buy { width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .btn-buy:active { transform: scale(0.95); }
+
+        /* Modal Box */
+        .modal-auth { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .auth-box { background: #1e293b; padding: 40px 30px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .auth-box input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
+        
+        #auth-error-msg { 
+            color: var(--danger); font-size: 0.9rem; font-weight: 800; 
+            margin-bottom: 15px; display: none;
+            text-shadow: 0 0 10px var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="custom-alert">
+        <span id="alert-icon"></span>
+        <span id="alert-text"></span>
+    </div>
+
+    <nav>
+        <div style="font-size: 1.5rem; font-weight: 800; color: #818cf8;">RANZZ_JB</div>
+        <div id="nav-actions">
+            <button id="btn-login-init" onclick="openAuth()" style="background: var(--primary); color:white; border:none; padding: 10px 25px; border-radius: 12px; font-weight:800; cursor:pointer;">Login</button>
+            <div id="user-info" class="hidden">
+                <span id="user-name" style="font-weight: 700;"></span>
+                <button onclick="logout()" style="color: var(--danger); border:none; background:none; cursor:pointer; margin-left: 15px; font-weight:800;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>TOKO DIGITAL MODERN</h1>
+        <p style="color: #94a3b8; margin-top: 10px;">Transaksi Otomatis via Gmail: <b>gustiranggayoni06@gmail.com</b></p>
+    </section>
+
+    <main class="container">
+        <div class="product-grid">
+            <div class="product-card">
+                <img src="1000095806.jpg" class="product-img" onerror="this.src='https://via.placeholder.com/400x220?text=Efootball+Squad'">
+                <div class="card-body">
+                    <h3 style="margin-bottom: 10px;">Akun Football Mythic 3096</h3>
+                    <p style="color: #94a3b8; font-size: 0.85rem;">Kekuatan Kolektif 3096 | Messi 101, De Bruyne 102</p>
+                    <div style="font-size: 1.6rem; font-weight: 800; color: #818cf8; margin: 20px 0;">Rp 200.000</div>
+                    <button class="btn-buy" onclick="orderViaGmail('Akun Football 3096', 'Rp 200.000')">Beli Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="auth-modal" class="modal-auth hidden">
+        <div class="auth-box">
+            <h2 id="auth-title" style="margin-bottom: 10px;">Daftar Akun</h2>
+            <div id="auth-error-msg">GAGAL: Password Salah!</div>
+            <input type="text" id="auth-user" placeholder="Username">
+            <input type="password" id="auth-pass" placeholder="Password">
+            <button class="btn-buy" onclick="handleAuth()" style="margin-top: 10px;">Konfirmasi</button>
+            <p id="toggle-text" style="margin-top: 20px; font-size: 0.85rem; cursor: pointer; color: #94a3b8;" onclick="toggleAuthMode()">Belum punya akun? Daftar</p>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCm--vENLF7tm40_YHg_1DWzExbAnH0",
+            authDomain: "flutter-ai-playground-e9460.firebaseapp.com",
+            databaseURL: "https://flutter-ai-playground-e9460-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "flutter-ai-playground-e9460",
+            storageBucket: "flutter-ai-playground-e9460.appspot.com",
+            messagingSenderId: "189868543960",
+            appId: "1:189868543960:web:c732035483d92f6feecad"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let authMode = 'register';
+
+        function showAlert(text, type = 'error') {
+            const box = document.getElementById('custom-alert');
+            document.getElementById('alert-text').innerText = text;
+            document.getElementById('alert-icon').innerText = type === 'error' ? '❌' : '✅';
+            box.className = 'show alert-' + type;
+            setTimeout(() => box.classList.remove('show'), 3000);
+        }
+
+        function toggleAuthMode() {
+            authMode = authMode === 'register' ? 'login' : 'register';
+            document.getElementById('auth-title').innerText = authMode === 'register' ? 'Daftar Akun' : 'Login Akun';
+            document.getElementById('toggle-text').innerText = authMode === 'register' ? 'Sudah punya akun? Login' : 'Belum punya akun? Daftar';
+            document.getElementById('auth-error-msg').style.display = 'none';
+        }
+
+        function openAuth() { document.getElementById('auth-modal').classList.remove('hidden'); }
+
+        async function handleAuth() {
+            const user = document.getElementById('auth-user').value.trim().toLowerCase();
+            const pass = document.getElementById('auth-pass').value.trim();
+            const errorDisplay = document.getElementById('auth-error-msg');
+
+            if (!user || !pass) return showAlert("Data tidak boleh kosong!");
+
+            const userRef = db.ref('users/' + user);
+            const snapshot = await userRef.once('value');
+            const userData = snapshot.val();
+
+            if (authMode === 'register') {
+                if (userData) {
+                    showAlert("Username '" + user + "' sudah terdaftar!");
+                } else {
+                    await userRef.set({ password: btoa(pass) });
+                    showAlert("Berhasil Daftar!", "success");
+                    toggleAuthMode();
+                }
+            } else {
+                if (userData && atob(userData.password) === pass) {
+                    localStorage.setItem('isLoggedIn', user);
+                    showAlert("Berhasil Login!", "success");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    errorDisplay.style.display = 'block';
+                    errorDisplay.innerText = "USERNAME ATAU PASSWORD SALAH!";
+                    showAlert("Akses Ditolak!");
+                }
+            }
+        }
+
+        // FUNGSI TRANSAKSI GMAIL OTOMATIS
+        function orderViaGmail(pName, pPrice) {
+            const user = localStorage.getItem('isLoggedIn');
+            if (!user) return openAuth();
+
+            const adminEmail = "gustiranggayoni06@gmail.com";
+            const subject = encodeURIComponent(`ORDER BARU - ${pName}`);
+            const body = encodeURIComponent(
+                `Halo Admin Ranzz_JB,\n\n` +
+                `Saya ingin membeli produk berikut:\n` +
+                `------------------------------------\n` +
+                `Nama Produk : ${pName}\n` +
+                `Harga       : ${pPrice}\n` +
+                `Username    : ${user}\n` +
+                `------------------------------------\n` +
+                `Mohon segera diproses. Terima kasih.`
+            );
+
+            // Membuka aplikasi Gmail otomatis
+            window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+        }
+
+        function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
+
+        window.onload = () => {
+            const user = localStorage.getItem('isLoggedIn');
+            if (user) {
+                document.getElementById('btn-login-init').classList.add('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-name').innerText = "Halo, " + user;
+            }
+        }
+    </script>
+</body>
+</html>
