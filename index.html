@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RANZZ_JB - Pro System v2</title>
+    <title>RANZZ_JB - Official Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -70,7 +70,7 @@
         .chat-header { background: var(--primary); padding: 15px; color: white; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
         #chat-content { flex: 1; padding: 15px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px; }
         
-        .msg-ai { background: var(--bg); padding: 10px; border-radius: 0 15px 15px 15px; align-self: flex-start; max-width: 85%; border: 1px solid rgba(125,125,125,0.1); line-height: 1.4; }
+        .msg-ai { background: var(--bg); padding: 10px; border-radius: 0 15px 15px 15px; align-self: flex-start; max-width: 85%; border: 1px solid rgba(125,125,125,0.1); line-height: 1.5; white-space: pre-line; }
         .msg-user { background: var(--primary); color: white; padding: 10px; border-radius: 15px 15px 0 15px; align-self: flex-end; max-width: 85%; }
 
         /* Quick Buttons AI */
@@ -115,8 +115,8 @@
     </nav>
 
     <header class="hero">
-        <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">SYSTEM PRO JB</h1>
-        <p style="color: var(--text-sub);">Platform Jual Beli Akun Digital & Top Up</p>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">RANZZ_JB STORE</h1>
+        <p style="color: var(--text-sub);">Trusted Digital Account Provider</p>
     </header>
 
     <main class="container">
@@ -133,18 +133,17 @@
     <div id="ai-btn" onclick="toggleChat()">🤖</div>
     <div id="ai-chat">
         <div class="chat-header">
-            <span>RANZZ-AI HELP CENTER</span>
+            <span>RANZZ-AI ASSISTANT</span>
             <span onclick="toggleChat()" style="cursor:pointer; font-size: 1.5rem;">&times;</span>
         </div>
         <div id="chat-content">
-            <div class="msg-ai">Halo! Saya RANZZ-AI. Ada yang bisa saya bantu terkait transaksi atau layanan kami? ✨</div>
+            <div class="msg-ai">Halo! Butuh nomor pembayaran atau bantuan lainnya? Saya siap membantu! ⚡</div>
         </div>
         
         <div class="quick-box">
-            <div class="q-btn" onclick="askQuick('Bagaimana cara bayar?')">💳 Cara Bayar</div>
-            <div class="q-btn" onclick="askQuick('Apakah aman beli di sini?')">🛡️ Keamanan</div>
-            <div class="q-btn" onclick="askQuick('Berapa lama akun dikirim?')">⚡ Pengiriman</div>
-            <div class="q-btn" onclick="askQuick('Metode pembayaran apa saja?')">💰 Metode</div>
+            <div class="q-btn" onclick="askQuick('Minta nomor pembayaran DANA')">🔵 Nomor DANA</div>
+            <div class="q-btn" onclick="askQuick('Minta nomor pembayaran GoPay')">🟢 Nomor GoPay</div>
+            <div class="q-btn" onclick="askQuick('Bagaimana cara bayarnya?')">💳 Cara Bayar</div>
         </div>
 
         <div class="chat-input">
@@ -188,16 +187,14 @@
             messagingSenderId: "189868543960",
             appId: "1:189868543960:web:c732035483d92f6feecad"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let authMode = 'register';
 
-        // THEME & ALERTS
         function toggleTheme() {
-            const current = document.body.getAttribute('data-theme');
-            const target = current === 'dark' ? 'light' : 'dark';
-            document.body.setAttribute('data-theme', target);
+            const body = document.body;
+            const target = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', target);
             localStorage.setItem('theme', target);
         }
 
@@ -208,7 +205,6 @@
             setTimeout(() => box.classList.remove('show'), 3000);
         }
 
-        // AUTH
         function openAuth() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function toggleAuthMode() {
             authMode = authMode === 'register' ? 'login' : 'register';
@@ -219,14 +215,12 @@
         async function handleAuth() {
             const user = document.getElementById('auth-user').value.toLowerCase().trim();
             const pass = document.getElementById('auth-pass').value.trim();
-            if(!user || !pass) return showAlert("Isi semua kolom!");
-
+            if(!user || !pass) return showAlert("Data tidak lengkap!");
             const userRef = db.ref('users/' + user);
             const snap = await userRef.once('value');
-
             if(authMode === 'register') {
-                if(snap.val()) return showAlert("Username sudah dipakai!");
-                await userRef.set({ password: btoa(pass), bio: "Member Baru Ranzz" });
+                if(snap.val()) return showAlert("Username sudah ada!");
+                await userRef.set({ password: btoa(pass), bio: "Member RANZZ_JB" });
                 showAlert("Berhasil Daftar!", "success");
                 toggleAuthMode();
             } else {
@@ -234,11 +228,11 @@
                 if(data && atob(data.password) === pass) {
                     localStorage.setItem('isLoggedIn', user);
                     location.reload();
-                } else showAlert("Username atau Password Salah!");
+                } else showAlert("Password salah!");
             }
         }
 
-        // AI LOGIC v2.1 (Digital Knowledge)
+        // AI LOGIC v2.3 (Integrated Recipient Names)
         function toggleChat() {
             const chat = document.getElementById('ai-chat');
             chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
@@ -262,57 +256,47 @@
             const input = document.getElementById('ai-input');
             const userMsg = input.value.trim();
             if(!userMsg) return;
-
             addChatMessage('user', userMsg);
             input.value = "";
 
             setTimeout(() => {
                 const lowMsg = userMsg.toLowerCase();
-                let response = "Mohon maaf, saya belum memahami pertanyaan tersebut. Bisa coba tanyakan tentang 'pembayaran', 'garansi', atau 'cara order'?";
+                let response = "Maaf, saya belum mengerti. Tanyakan 'dana', 'gopay', atau 'bayar'.";
 
-                if(lowMsg.includes("bayar") || lowMsg.includes("pembayaran")) {
-                    response = "Untuk pembayaran, kami menerima:\n1. DANA/OVO/GoPay\n2. Transfer Bank (BCA/BRI)\n3. QRIS (Semua Bank/E-Wallet).\nSilakan pilih produk dan klik tombol beli!";
-                } else if(lowMsg.includes("cara beli") || lowMsg.includes("order")) {
-                    response = "1. Pilih akun yang diinginkan.\n2. Klik 'Beli Sekarang'.\n3. Kirim pesan ke Gmail Admin.\n4. Lakukan pembayaran.\n5. Akun akan langsung dikirim oleh admin.";
-                } else if(lowMsg.includes("aman") || lowMsg.includes("garansi") || lowMsg.includes("legal")) {
-                    response = "Tentu! Semua akun kami 100% legal dan bergaransi selama 30 hari jika terjadi masalah (bukan kesalahan buyer). Kami adalah toko terverifikasi.";
-                } else if(lowMsg.includes("berapa lama") || lowMsg.includes("pengiriman") || lowMsg.includes("kapan")) {
-                    response = "Pengiriman sangat cepat! Setelah bukti pembayaran dikirim, admin akan memproses data akun dalam waktu 5-15 menit.";
+                if(lowMsg.includes("dana")) {
+                    response = "🔵 PEMBAYARAN DANA:\n\nNomor: 081218002778\nA.N: S*****I\n\nSilakan transfer dan kirim bukti ke admin.";
+                } else if(lowMsg.includes("gopay") || lowMsg.includes("go-pay")) {
+                    response = "🟢 PEMBAYARAN GOPAY:\n\nNomor: 085718522934\nA.N: D***d R*****I R****N\n\nHarap cek kembali nama penerima sebelum kirim!";
+                } else if(lowMsg.includes("bayar") || lowMsg.includes("cara")) {
+                    response = "Cara Pembayaran:\n1. Pilih produk yang ingin dibeli.\n2. Klik tombol beli.\n3. Transfer ke nomor DANA/GOPAY kami.\n4. Kirim bukti transfer ke Admin via Gmail/WA.";
                 } else if(lowMsg.includes("halo") || lowMsg.includes("p")) {
-                    response = "Halo! Saya asisten RANZZ_JB. Ada yang bisa dibantu mengenai pembayaran atau detail akun?";
-                } else if(lowMsg.includes("diskon") || lowMsg.includes("murah")) {
-                    response = "Kami sering mengadakan promo! Cek berkala halaman ini atau tanyakan langsung ke admin untuk harga spesial pembelian pertama.";
+                    response = "Halo! Saya AI Store. Ada yang bisa saya bantu terkait nomor DANA atau GOPAY?";
+                } else if(lowMsg.includes("proses") || lowMsg.includes("kapan")) {
+                    response = "Proses kirim akun hanya 5-15 menit setelah pembayaran Anda kami terima. Sangat cepat!";
                 }
 
                 addChatMessage('ai', response);
             }, 600);
         }
 
-        // PROFILE & SETTINGS
         function openProfile() { document.getElementById('profile-modal').classList.remove('hidden'); }
         function closeProfile() { document.getElementById('profile-modal').classList.add('hidden'); }
-
         async function saveSettings() {
             const user = localStorage.getItem('isLoggedIn');
             const newBio = document.getElementById('user-bio').value;
             const newPass = document.getElementById('new-password').value;
-            
             let updateData = { bio: newBio };
             if(newPass) updateData.password = btoa(newPass);
-
             await db.ref('users/' + user).update(updateData);
-            showAlert("Profil berhasil disimpan!", "success");
+            showAlert("Profil diperbarui!", "success");
             setTimeout(closeProfile, 1000);
         }
-
         function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
-
         function orderViaGmail(p, pr) {
             const user = localStorage.getItem('isLoggedIn');
             if(!user) return openAuth();
-            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=User: ${user} ingin membeli ${p} seharga ${pr}. Mohon instruksi pembayaran admin.`;
+            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=Halo Admin, Saya ${user} mau beli ${p} harga ${pr}.`;
         }
-
         window.onload = async () => {
             const user = localStorage.getItem('isLoggedIn');
             if(user) {
