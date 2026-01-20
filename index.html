@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RANZZ_JB - Pro System</title>
+    <title>RANZZ_JB - Pro System v2</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -56,29 +56,31 @@
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
             background: var(--primary); border-radius: 50%; display: flex;
             align-items: center; justify-content: center; font-size: 1.5rem;
-            cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 999;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 2000;
         }
 
         /* AI Chat Box */
         #ai-chat {
-            position: fixed; bottom: 100px; right: 30px; width: 300px; height: 400px;
+            position: fixed; bottom: 100px; right: 30px; width: 320px; height: 450px;
             background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(125,125,125,0.2);
-            display: none; flex-direction: column; z-index: 999; overflow: hidden;
+            display: none; flex-direction: column; z-index: 2000; overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .chat-header { background: var(--primary); padding: 15px; color: white; font-weight: 800; display: flex; justify-content: space-between; }
-        #chat-content { flex: 1; padding: 15px; overflow-y: auto; font-size: 0.9rem; }
-        .chat-input { display: flex; padding: 10px; background: var(--bg); }
-        .chat-input input { flex: 1; padding: 8px; border-radius: 8px; border: none; outline: none; background: var(--card-bg); color: var(--text-main); }
+        .chat-header { background: var(--primary); padding: 15px; color: white; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+        #chat-content { flex: 1; padding: 15px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px; }
+        
+        .msg-ai { background: var(--bg); padding: 10px; border-radius: 0 15px 15px 15px; align-self: flex-start; max-width: 85%; border: 1px solid rgba(125,125,125,0.1); }
+        .msg-user { background: var(--primary); color: white; padding: 10px; border-radius: 15px 15px 0 15px; align-self: flex-end; max-width: 85%; }
 
-        /* Modal Profile & Settings */
-        .modal-custom { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .chat-input { display: flex; padding: 12px; background: var(--bg); gap: 8px; }
+        .chat-input input { flex: 1; padding: 10px; border-radius: 10px; border: none; outline: none; background: var(--card-bg); color: var(--text-main); }
+        .chat-input button { background: var(--primary); border: none; color: white; padding: 0 15px; border-radius: 10px; cursor: pointer; }
+
+        /* Modal Styles */
+        .modal-custom { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 3000; }
         .modal-box { background: var(--card-bg); padding: 30px; border-radius: 25px; width: 90%; max-width: 400px; border: 1px solid rgba(125,125,125,0.2); }
-        .modal-box input, .modal-box textarea { 
-            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; 
-            border: 1px solid rgba(125,125,125,0.2); background: var(--bg); color: var(--text-main); 
-        }
+        .modal-box input, .modal-box textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid rgba(125,125,125,0.2); background: var(--bg); color: var(--text-main); }
 
         .hero { padding: 120px 5% 40px; text-align: center; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
@@ -126,11 +128,16 @@
 
     <div id="ai-btn" onclick="toggleChat()">🤖</div>
     <div id="ai-chat">
-        <div class="chat-header"><span>RANZZ-AI</span><span onclick="toggleChat()" style="cursor:pointer;">×</span></div>
-        <div id="chat-content">Halo! Ada yang bisa saya bantu tentang produk di sini?</div>
+        <div class="chat-header">
+            <span>RANZZ-AI ASSISTANT</span>
+            <span onclick="toggleChat()" style="cursor:pointer; font-size: 1.5rem;">&times;</span>
+        </div>
+        <div id="chat-content">
+            <div class="msg-ai">Halo! Saya asisten RANZZ_JB. Silakan tanya apa saja tentang toko kami! ✨</div>
+        </div>
         <div class="chat-input">
-            <input type="text" id="ai-input" placeholder="Tanya sesuatu...">
-            <button onclick="askAI()" style="background:none; border:none; margin-left:5px; cursor:pointer;">➡️</button>
+            <input type="text" id="ai-input" placeholder="Tanya sesuatu..." onkeypress="if(event.key === 'Enter') askAI()">
+            <button onclick="askAI()">Kirim</button>
         </div>
     </div>
 
@@ -193,7 +200,8 @@
         function openAuth() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function toggleAuthMode() {
             authMode = authMode === 'register' ? 'login' : 'register';
-            document.getElementById('auth-title').innerText = authMode === 'register' ? 'Daftar' : 'Login';
+            document.getElementById('auth-title').innerText = authMode === 'register' ? 'Daftar Akun' : 'Login Akun';
+            document.getElementById('toggle-text').innerText = authMode === 'register' ? 'Punya akun? Login' : 'Belum punya akun? Daftar';
         }
 
         async function handleAuth() {
@@ -205,7 +213,7 @@
             const snap = await userRef.once('value');
 
             if(authMode === 'register') {
-                if(snap.val()) return showAlert("Username dipakai!");
+                if(snap.val()) return showAlert("Username sudah dipakai!");
                 await userRef.set({ password: btoa(pass), bio: "Member Baru Ranzz" });
                 showAlert("Berhasil Daftar!", "success");
                 toggleAuthMode();
@@ -214,33 +222,54 @@
                 if(data && atob(data.password) === pass) {
                     localStorage.setItem('isLoggedIn', user);
                     location.reload();
-                } else showAlert("Salah Password!");
+                } else showAlert("Username atau Password Salah!");
             }
         }
 
-        // AI LOGIC
+        // AI SESSION LOGIC v2
         function toggleChat() {
             const chat = document.getElementById('ai-chat');
             chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
         }
 
+        function addChatMessage(role, text) {
+            const content = document.getElementById('chat-content');
+            const div = document.createElement('div');
+            div.className = role === 'ai' ? 'msg-ai' : 'msg-user';
+            div.innerText = text;
+            content.appendChild(div);
+            content.scrollTop = content.scrollHeight;
+        }
+
         function askAI() {
             const input = document.getElementById('ai-input');
-            const content = document.getElementById('chat-content');
-            const val = input.value.toLowerCase();
-            
-            content.innerHTML += `<div style="text-align:right; margin:5px; color:var(--primary)"><b>Kamu:</b> ${input.value}</div>`;
-            
-            let reply = "Maaf, saya tidak mengerti. Coba tanya tentang 'harga', 'stok', atau 'admin'.";
-            if(val.includes("harga")) reply = "Harga produk mulai dari Rp 50.000 sampai Rp 1.000.000 tergantung spek akun.";
-            if(val.includes("admin")) reply = "Admin bisa dihubungi melalui tombol 'Beli' atau email: gustiranggayoni06@gmail.com";
-            if(val.includes("halo") || val.includes("p")) reply = "Halo! Saya RANZZ-AI. Mau tanya apa hari ini?";
-            
-            setTimeout(() => {
-                content.innerHTML += `<div style="margin:5px;"><b>AI:</b> ${reply}</div>`;
-                content.scrollTop = content.scrollHeight;
-            }, 500);
+            const userMsg = input.value.trim();
+            if(!userMsg) return;
+
+            addChatMessage('user', userMsg);
             input.value = "";
+
+            // Simulasi AI Sedang Berpikir
+            setTimeout(() => {
+                const lowMsg = userMsg.toLowerCase();
+                let response = "Saya asisten pintar RANZZ. Saya belum mengerti maksud Anda, coba tanya tentang 'cara beli', 'aman', atau 'produk'.";
+
+                if(lowMsg.includes("halo") || lowMsg.includes("p")) {
+                    response = "Halo! Senang bertemu Anda. Ada yang bisa saya bantu di toko RANZZ_JB?";
+                } else if(lowMsg.includes("cara beli") || lowMsg.includes("order")) {
+                    response = "Caranya mudah! Klik tombol 'Beli Sekarang' pada produk yang Anda suka, lalu Anda akan diarahkan ke Gmail Admin untuk transaksi aman.";
+                } else if(lowMsg.includes("aman") || lowMsg.includes("legal")) {
+                    response = "Tentu saja! Semua akun di RANZZ_JB bergaransi dan legal. Kami mengutamakan kepercayaan pelanggan.";
+                } else if(lowMsg.includes("harga") || lowMsg.includes("murah")) {
+                    response = "Kami menyediakan produk berkualitas dengan harga bersaing, mulai dari puluhan ribu hingga ratusan ribu rupiah.";
+                } else if(lowMsg.includes("terima kasih") || lowMsg.includes("thanks")) {
+                    response = "Sama-sama! Jangan ragu bertanya lagi ya.";
+                } else if(lowMsg.includes("siapa") && lowMsg.includes("ranzz")) {
+                    response = "RANZZ adalah owner toko ini, seorang penyedia layanan digital terpercaya.";
+                }
+
+                addChatMessage('ai', response);
+            }, 600);
         }
 
         // PROFILE & SETTINGS
@@ -256,7 +285,7 @@
             if(newPass) updateData.password = btoa(newPass);
 
             await db.ref('users/' + user).update(updateData);
-            showAlert("Profil diperbarui!", "success");
+            showAlert("Profil berhasil disimpan!", "success");
             setTimeout(closeProfile, 1000);
         }
 
@@ -265,7 +294,7 @@
         function orderViaGmail(p, pr) {
             const user = localStorage.getItem('isLoggedIn');
             if(!user) return openAuth();
-            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=User: ${user} ingin beli ${p} harga ${pr}`;
+            window.location.href = `mailto:gustiranggayoni06@gmail.com?subject=Beli ${p}&body=User: ${user} ingin membeli ${p} seharga ${pr}. Mohon diproses admin.`;
         }
 
         window.onload = async () => {
@@ -274,8 +303,6 @@
                 document.getElementById('btn-login-init').classList.add('hidden');
                 document.getElementById('user-info').classList.remove('hidden');
                 document.getElementById('user-name').innerText = user;
-                
-                // Load Bio user
                 const snap = await db.ref('users/' + user).once('value');
                 if(snap.val() && snap.val().bio) document.getElementById('user-bio').value = snap.val().bio;
             }
