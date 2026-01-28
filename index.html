@@ -3,236 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VORTEX V.59 | CHANNEL EDITION</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>VORTEX V.116 | MASTER RANZZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0e17; --card: #151a26; --accent: #0062ff; 
-            --dana: #008ced; --gopay: #00aa13; --success: #00d285; 
-            --gold: #ffaa00; --danger: #ff3b30; --text: #ffffff;
+            --bg: #010204; --card: rgba(28,28,30,0.7); --border: rgba(255,255,255,0.1);
+            --accent: #0a84ff; --gopay: #0081a0; --dana: #007aff; --text: #ffffff; --dim: #8e8e93; --success: #32d74b; --danger: #ff453a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
 
-        header {
-            padding: 18px 20px; background: rgba(21, 26, 38, 0.9); backdrop-filter: blur(15px);
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 1000;
-        }
-        .v-logo { font-family: 'Orbitron'; font-weight: 900; color: var(--accent); font-size: 1.1rem; letter-spacing: 1px; }
-        .bal-pill { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 12px; border: 1px solid rgba(0,98,255,0.3); }
-        .bal-pill b { font-family: 'Orbitron'; color: var(--success); font-size: 12px; }
+        /* iOS Alert */
+        #custom-alert { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(44,44,46,0.95); backdrop-filter: blur(20px); padding: 12px 25px; border-radius: 25px; z-index: 10000; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-weight: 600; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        #custom-alert.show { top: 25px; }
 
-        .main-view { height: calc(100vh - 150px); overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-        .page { display: none; animation: fadeIn 0.4s ease-out; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Success Overlay */
+        #success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(1, 2, 4, 0.9); backdrop-filter: blur(15px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; animation: fadeIn 0.3s ease; }
+        .check-icon { font-size: 80px; margin-bottom: 20px; transform: scale(0); animation: popIn 0.5s 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { to { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card { background: var(--card); border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .btn-main { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--accent); color: white; font-family: 'Orbitron'; font-weight: 900; font-size: 10px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,98,255,0.2); }
+        /* Premium Sheet */
+        #add-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1c1c1e; z-index: 2000; border-radius: 35px 35px 0 0; padding: 25px; transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); border-top: 1px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+        .sheet-bar { width: 40px; height: 5px; background: #3a3a3c; border-radius: 10px; margin: 0 auto 20px; }
+
+        /* Glass Upload UI */
+        .upload-zone { width: 100%; height: 220px; background: rgba(255,255,255,0.03); border: 2px dashed rgba(255,255,255,0.1); border-radius: 25px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 20px; transition: 0.3s; }
+        #prev-prod { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: 23px; display: none; position: absolute; top: 0; left: 0; z-index: 5; }
+        .upload-label { text-align: center; color: var(--dim); font-weight: 600; z-index: 1; }
+
+        header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .balance-chip { background: #1c1c1e; padding: 8px 18px; border-radius: 25px; font-weight: 800; color: var(--success); border: 1px solid var(--border); }
+
+        .main-view { height: calc(100vh - 150px); overflow-y: auto; padding: 0 20px 100px; }
+        .page { display: none; } .page.active { display: block; animation: fade 0.4s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Wallet Cards */
+        .wallet-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-snap-type: x mandatory; }
+        .wallet-scroll::-webkit-scrollbar { display: none; }
+        .pay-card { min-width: 85%; scroll-snap-align: center; border-radius: 28px; padding: 25px; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+        .card-dana { background: linear-gradient(135deg, #007aff, #0056b3); }
+        .card-gopay { background: linear-gradient(135deg, #0081a0, #005f73); }
+        .pay-val { font-family: 'JetBrains Mono', monospace; font-size: 22px; margin: 12px 0; display: block; }
+
+        .input-box { background: #2c2c2e; border: none; padding: 18px; border-radius: 18px; color: white; width: 100%; margin-bottom: 12px; outline: none; font-size: 16px; }
+        .btn-ios { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; width: 100%; font-size: 16px; margin-top: 10px; box-shadow: 0 10px 20px rgba(10,132,255,0.3); }
+
+        .card-modern { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(15px); }
+        .card-modern img { width: 100%; height: 130px; object-fit: cover; border-radius: 18px; margin-bottom: 10px; }
+
+        nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); border-top: 0.5px solid var(--border); display: flex; justify-content: space-around; padding: 12px 10px 35px; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.3; transition: 0.3s; }
+        .nav-item.active { opacity: 1; transform: scale(1.1); }
+        .nav-icon { font-size: 24px; }
         
-        /* TOMBOL TESTIMONI SALURAN WA */
-        .btn-testi { 
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; padding: 16px; border-radius: 18px; 
-            background: rgba(37, 211, 102, 0.1); color: #25d366; 
-            text-decoration: none; font-weight: 800; font-size: 11px; 
-            border: 1px solid rgba(37, 211, 102, 0.3); margin-top: 10px;
-        }
-
-        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .del-btn { background: rgba(255, 59, 48, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px; border-radius: 12px; font-size: 10px; font-weight: 800; }
-
-        input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; font-weight: 700; background: rgba(0,0,0,0.2); color: white; outline: none; }
-
-        nav { position: fixed; bottom: 15px; left: 5%; width: 90%; background: rgba(21, 26, 38, 0.95); backdrop-filter: blur(15px); border-radius: 22px; display: flex; justify-content: space-around; padding: 15px; border: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { font-size: 22px; opacity: 0.3; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-5px); }
-
-        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 5000; }
+        .admin-only { display: none !important; }
+        .is-admin .admin-only { display: block !important; }
     </style>
 </head>
-<body>
+<body id="body-tag">
 
-    <header>
-        <div class="v-logo">VORTEX V.59</div>
-        <div class="bal-pill"><b id="h-bal">Rp 0</b></div>
-    </header>
-
-    <div id="modal">
-        <div class="modal-card" style="background:var(--card); width:85%; padding:25px; border-radius:30px; text-align:center; border:1px solid var(--accent);">
-            <h4 style="font-family:'Orbitron'; font-size:10px; margin-bottom:15px; color:var(--accent);">// SECURE_INVOICE</h4>
-            <div id="m-box" style="padding:15px; border-radius:20px; margin-bottom:15px;">
-                <h2 id="m-amt" style="font-family:'Orbitron'; margin-bottom:10px;">Rp 0</h2>
-                <div style="background:rgba(0,0,0,0.4); padding:15px; border-radius:15px; font-size:11px; text-align:left;">
-                    <p style="opacity:0.5; font-size:9px;">NOMOR TUJUAN:</p>
-                    <b id="m-num" style="font-size:16px; color:white;">-</b>
-                    <p style="opacity:0.5; font-size:9px; margin-top:10px;">ATAS NAMA:</p>
-                    <b id="m-name" style="font-size:11px; color:white;">-</b>
-                </div>
-            </div>
-            <button class="btn-main" onclick="sendTicket()">SAYA SUDAH TRANSFER</button>
-            <p onclick="closeM()" style="margin-top:18px; font-size:10px; color:#666; cursor:pointer;">BATALKAN</p>
-        </div>
+    <div id="success-overlay">
+        <div class="check-icon">✅</div>
+        <h2 style="font-weight: 800;">BERHASIL DIPOSTING!</h2>
+        <p style="color: var(--dim); margin-top: 10px;">Produk sudah tayang di Shop 🚀</p>
     </div>
 
-    <div class="main-view">
+    <div id="custom-alert">
+        <span id="alert-icon">⚠️</span> <span id="alert-msg">Pesan</span>
+    </div>
+
+    <div id="add-panel">
+        <div class="sheet-bar"></div>
+        <h3 style="margin-bottom:20px; text-align:center;">New Product 📸</h3>
         
+        <input type="file" id="file-prod" accept="image/*" onchange="previewImg(this)" style="display:none;">
+        <div class="upload-zone" onclick="document.getElementById('file-prod').click()">
+            <div class="upload-label" id="p-label">
+                <span style="font-size:40px;">🖼️</span><br>
+                <span>Tap to Upload Photo</span>
+            </div>
+            <img id="prev-prod">
+        </div>
+
+        <input type="text" id="add-n" class="input-box" placeholder="Product Name">
+        <input type="number" id="add-p" class="input-box" placeholder="Price (Rp)">
+        <button class="btn-ios" id="btn-publish" onclick="uploadAndPush()">Post to Shop 🚀</button>
+        <button onclick="toggleAddPanel()" style="width:100%; background:none; border:none; color:var(--dim); margin-top:15px; font-weight:700;">Cancel</button>
+    </div>
+
+    <header>
+        <div style="font-size:24px; font-weight:900; letter-spacing:-1px;">VORTEX</div>
+        <div class="balance-chip" id="user-status">Rp 0</div>
+    </header>
+
+    <div class="main-view">
         <div id="p-home" class="page active">
-            <div class="card" style="background: linear-gradient(135deg, #0062ff, #00d2ff); border:none; box-shadow: 0 10px 30px rgba(0,98,255,0.3);">
-                <p style="font-family:'Orbitron'; font-size:8px; opacity:0.8;">MASTER_BALANCE</p>
-                <h1 id="main-bal" style="font-family:'Orbitron'; margin:12px 0; font-size:32px;">Rp 0</h1>
-                <button onclick="nt('p-prof', document.querySelectorAll('.nav-item')[4])" style="width:100%; padding:12px; border-radius:12px; border:none; background:rgba(255,255,255,0.25); color:white; font-size:10px; font-weight:800; backdrop-filter:blur(5px);">⚡ RECHARGE SALDO</button>
-            </div>
-            
-            <h4 style="font-family:'Orbitron'; font-size:10px; margin:20px 0 12px; opacity:0.4; letter-spacing:1px;">// PRODUCT_LIST</h4>
-            <div id="prod-list"></div>
-
-            <a href="https://whatsapp.com/channel/0029Vb6aiqD84OmJxmCm4z0j" target="_blank" class="btn-testi">
-                <span>⭐</span> LIHAT TESTIMONI (SALURAN WA)
-            </a>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;" id="prod-list"></div>
         </div>
 
-        <div id="p-add" class="page">
-            <div class="card">
-                <h3 style="font-family:'Orbitron'; margin-bottom:20px; color:var(--accent);">ADD_PRODUCT</h3>
-                <input type="text" id="add-n" placeholder="Nama Produk">
-                <input type="number" id="add-p" placeholder="Harga Jual">
-                <select id="add-c">
-                    <option value="Premium">Premium</option>
-                    <option value="Sultan">Sultan</option>
-                </select>
-                <button class="btn-main" onclick="pushP()">KIRIM KE SERVER</button>
-            </div>
-        </div>
+        <div id="p-topup" class="page">
+            <div id="wallet-core" style="display:none;">
+                <div class="wallet-scroll">
+                    <div class="pay-card card-dana">
+                        <p style="font-size:10px; font-weight:800; opacity:0.8;">E-WALLET DANA 🔵</p>
+                        <span class="pay-val">081218002778</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:13px;">S*****I</span>
+                            <button onclick="copyNum('081218002778')" style="background:rgba(255,255,255,0.2); border:none; padding:8px 15px; border-radius:12px; color:white; font-size:10px; font-weight:800;">COPY 📋</button>
+                        </div>
+                    </div>
+                    <div class="pay-card card-gopay">
+                        <p style="font-size:10px; font-weight:800; opacity:0.8;">E-WALLET GOPAY 🟢</p>
+                        <span class="pay-val">085718522934</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:11px;">D***D R*****I R****N</span>
+                            <button onclick="copyNum('085718522934')" style="background:rgba(255,255,255,0.2); border:none; padding:8px 15px; border-radius:12px; color:white; font-size:10px; font-weight:800;">COPY 📋</button>
+                        </div>
+                    </div>
+                </div>
 
-        <div id="p-manage" class="page">
-            <div class="card">
-                <h3 style="font-family:'Orbitron'; margin-bottom:15px;">DATABASE_MANAGER</h3>
-                <div id="m-list"></div>
+                <div class="card-modern" style="margin-top:20px;">
+                    <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">Minimal Top Up: <b>Rp 10.000</b></p>
+                    <input type="number" id="in-topup" class="input-box" placeholder="Amount Rp...">
+                    <button class="btn-ios" onclick="requestTopup()">Confirm Transfer 💸</button>
+                </div>
+                <div class="admin-only" id="admin-area"></div>
             </div>
-        </div>
-
-        <div id="p-db" class="page">
-            <h4 style="font-family:'Orbitron'; font-size:10px; color:var(--gold); margin-bottom:15px;">WAITING_CONFIRMATION</h4>
-            <div id="t-list"></div>
+            <div id="wallet-gate" class="card-modern" style="text-align:center;">
+                <h3>Wallet Locked 🔒</h3>
+                <button class="btn-ios" onclick="nt('p-prof')">Sign In</button>
+            </div>
         </div>
 
         <div id="p-prof" class="page">
-            <div class="card" style="text-align:center;">
-                <div style="width:70px; height:70px; background:var(--accent); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-family:'Orbitron'; font-size:30px; box-shadow:0 0 20px rgba(0,98,255,0.4);">R</div>
-                <h3 style="font-family:'Orbitron';">RANZZ_OWN</h3>
-                <p style="font-size:10px; color:var(--accent); font-weight:800; letter-spacing:1px; margin-top:5px;">OFFICIAL_ADMIN</p>
-            </div>
-
-            <div class="card">
-                <h4 style="font-family:'Orbitron'; font-size:10px; margin-bottom:15px;">DEPOSIT_GATEWAY</h4>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <div id="o-dana" class="del-btn" style="flex:1; text-align:center; border-color:var(--dana); color:var(--dana);" onclick="sel('dana')">DANA</div>
-                    <div id="o-gopay" class="del-btn" style="flex:1; text-align:center; border-color:var(--gopay); color:var(--gopay);" onclick="sel('gopay')">GOPAY</div>
+            <div id="auth-gate">
+                <div class="card-modern">
+                    <h2 style="margin-bottom:15px;">Access Account 🔑</h2>
+                    <input type="text" id="inp-u" class="input-box" placeholder="Username">
+                    <input type="password" id="inp-p" class="input-box" placeholder="Password">
+                    <button class="btn-ios" onclick="handleAuth('login')">Sign In 📥</button>
+                    <button class="btn-ios" style="background:none; color:var(--accent);" onclick="handleAuth('register')">Register ✨</button>
                 </div>
-                <input type="number" id="in-a" placeholder="Nominal Top Up">
-                <button class="btn-main" onclick="openM()">KONFIRMASI TOP UP</button>
+            </div>
+            <div id="profile-core" style="display:none;">
+                <div class="card-modern" style="text-align:center;">
+                    <div style="font-size:60px; margin-bottom:15px;">👤</div>
+                    <h2 id="disp-user">Username</h2>
+                    <p id="disp-role" style="color:var(--dim); margin-bottom:20px;"></p>
+                    <button class="btn-ios" style="background:var(--danger);" onclick="location.reload()">Log Out 🚪</button>
+                </div>
+                <div class="admin-only" id="m-list" style="margin-top:20px;"></div>
             </div>
         </div>
-
     </div>
 
     <nav>
-        <div class="nav-item active" onclick="nt('p-home', this)">🏠</div>
-        <div class="nav-item" onclick="nt('p-add', this)">➕</div>
-        <div class="nav-item" onclick="nt('p-manage', this)">⚙️</div>
-        <div class="nav-item" onclick="nt('p-db', this)">🛡️</div>
-        <div class="nav-item" onclick="nt('p-prof', this)">👤</div>
+        <div class="nav-item active" onclick="nt('p-home', this)">
+            <span class="nav-icon">🏠</span>
+        </div>
+        <div class="nav-item" onclick="nt('p-topup', this)">
+            <span class="nav-icon">💵</span>
+        </div>
+        <div class="nav-item admin-only" onclick="toggleAddPanel()">
+            <div style="background:var(--accent); width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:22px; margin-top:-5px;">➕</div>
+        </div>
+        <div class="nav-item" onclick="nt('p-prof', this)">
+            <span class="nav-icon">👤</span>
+        </div>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, get, set, onValue, push, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        const IMGBB_KEY = "34f195861496a99264c7674143a75871";
         const cf = { databaseURL: "https://flutter-ai-playground-e9460-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        const app = initializeApp(cf);
-        const db = getDatabase(app);
-
-        let bal = 0, met = 'dana';
+        const app = initializeApp(cf); const db = getDatabase(app);
+        let userLog = null;
         const f = (v) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
-        
-        const ow = {
-            dana: { n: "081218002778", a: "S*****I", c: "rgba(0,140,237,0.1)", t: "#008ced" },
-            gopay: { n: "085718522934", a: "D***D R*****I R****N", c: "rgba(0,170,19,0.1)", t: "#00aa13" }
+
+        window.showAlert = (msg, icon = '⚠️') => {
+            const el = document.getElementById('custom-alert');
+            document.getElementById('alert-msg').innerText = msg;
+            document.getElementById('alert-icon').innerText = icon;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
         };
 
-        onValue(ref(db, 'master_data/balance'), (s) => {
-            bal = s.val() || 0;
-            document.getElementById('h-bal').innerText = f(bal);
-            document.getElementById('main-bal').innerText = f(bal);
-        });
-
-        window.pushP = async () => {
-            const n = document.getElementById('add-n').value, p = document.getElementById('add-p').value;
-            if(!n || !p) return alert("Data tidak boleh kosong!");
-            await push(ref(db, 'products'), { name: n, price: parseInt(p), cat: document.getElementById('add-c').value });
-            alert("Produk Berhasil Ditambahkan!");
-            document.getElementById('add-n').value = ''; document.getElementById('add-p').value = '';
+        window.copyNum = (num) => {
+            navigator.clipboard.writeText(num);
+            showAlert("Berhasil Disalin! 📋", "✅");
         };
 
-        onValue(ref(db, 'products'), (s) => {
-            const l = document.getElementById('prod-list'), m = document.getElementById('m-list');
-            l.innerHTML = ''; m.innerHTML = '';
-            s.forEach(x => {
-                const d = x.val();
-                l.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div><b style="font-size:14px;">${d.name}</b><br><small style="color:var(--success); font-weight:800;">${f(d.price)}</small></div>
-                    <span style="font-size:9px; background:rgba(255,255,255,0.05); padding:6px 10px; border-radius:10px; font-weight:900;">${d.cat}</span>
-                </div>`;
-                m.innerHTML += `<div class="manage-item">
-                    <div><b>${d.name}</b><br><small style="opacity:0.5;">${f(d.price)}</small></div>
-                    <button class="del-btn" onclick="delP('${x.key}')">HAPUS</button>
-                </div>`;
+        window.handleAuth = async (mode) => {
+            const u = document.getElementById('inp-u').value.trim(), p = document.getElementById('inp-p').value.trim();
+            if(!u || !p) return showAlert("Lengkapi data! 📝");
+            const r = ref(db, 'vortex_users/' + u); const s = await get(r);
+            if(mode === 'register') {
+                if(s.exists()) return showAlert("Username ada! ❌");
+                const uData = { username: u, password: p, balance: 0, role: (u === "Ranzz_Own" ? "OWNER" : "MEMBER") };
+                await set(r, uData); applyLogin(uData);
+            } else {
+                if(!s.exists() || s.val().password !== p) return showAlert("Login Gagal! ❌");
+                applyLogin(s.val());
+            }
+        };
+
+        function applyLogin(uData) {
+            userLog = uData;
+            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('profile-core').style.display = 'block';
+            document.getElementById('wallet-gate').style.display = 'none';
+            document.getElementById('wallet-core').style.display = 'block';
+            document.getElementById('disp-user').innerText = userLog.username;
+            document.getElementById('disp-role').innerText = "VORTEX " + userLog.role;
+            if(userLog.role === "OWNER") { document.getElementById('body-tag').classList.add('is-admin'); loadAdmin(); }
+            onValue(ref(db, `vortex_users/${userLog.username}/balance`), snap => {
+                document.getElementById('user-status').innerText = f(snap.val() || 0);
             });
-        });
+            nt('p-home', document.querySelector('.nav-item'));
+        }
 
-        window.delP = async (k) => { if(confirm("Hapus produk ini secara permanen?")) await remove(ref(db, 'products/'+k)); };
-
-        window.sel = (m) => { met = m; alert("Metode dipilih: " + m.toUpperCase()); };
-        window.openM = () => {
-            const a = document.getElementById('in-a').value; if(!a || a < 1000) return alert("Minimal Rp 1.000");
-            const d = ow[met];
-            document.getElementById('m-box').style.background = d.c;
-            document.getElementById('m-amt').innerText = f(a); document.getElementById('m-amt').style.color = d.t;
-            document.getElementById('m-num').innerText = d.n; document.getElementById('m-name').innerText = d.a;
-            document.getElementById('modal').style.display = 'flex';
-        };
-        window.closeM = () => document.getElementById('modal').style.display = 'none';
-        window.sendTicket = async () => {
-            const a = parseInt(document.getElementById('in-a').value);
-            await push(ref(db, 'tickets'), { amt: a, met: met.toUpperCase(), date: new Date().toLocaleString() });
-            alert("Bukti terkirim! Silakan tunggu konfirmasi admin."); closeM();
+        window.requestTopup = async () => {
+            const amt = parseInt(document.getElementById('in-topup').value);
+            if(!amt || amt < 10000) return showAlert("Min Rp 10.000! 💰");
+            await push(ref(db, 'topup_tickets'), { uid: userLog.username, amount: amt });
+            showAlert("Tiket Terkirim! ⏳", "📩");
+            document.getElementById('in-topup').value = '';
         };
 
-        onValue(ref(db, 'tickets'), (s) => {
-            const l = document.getElementById('t-list'); l.innerHTML = '';
-            s.forEach(x => {
-                const t = x.val();
-                l.innerHTML += `<div class="card">
-                    <b>${t.met} - ${f(t.amt)}</b>
-                    <div style="display:flex; gap:10px; margin-top:12px;">
-                        <button onclick="appv('${x.key}', ${t.amt})" style="flex:1; background:var(--success); border:none; padding:10px; border-radius:12px; color:white; font-weight:800;">APPROVE</button>
-                        <button onclick="rej('${x.key}')" style="flex:1; background:rgba(255,255,255,0.05); border:none; padding:10px; border-radius:12px; color:white;">REJECT</button>
-                    </div>
-                </div>`;
+        function loadAdmin() {
+            onValue(ref(db, 'topup_tickets'), (s) => {
+                const area = document.getElementById('admin-area');
+                area.innerHTML = '<h4 style="margin:20px 0 10px;">Requests 📩</h4>';
+                s.forEach(x => { const d = x.val();
+                    area.innerHTML += `<div class="card-modern" style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
+                        <span><b>${d.uid}</b><br><small>${f(d.amount)}</small></span>
+                        <button onclick="accTiket('${d.uid}', ${d.amount}, '${x.key}')" style="background:var(--success); border:none; color:white; padding:8px 15px; border-radius:12px; font-weight:800;">ACC ✅</button>
+                    </div>`;
+                });
             });
-        });
+            onValue(ref(db, 'products'), (s) => {
+                const mList = document.getElementById('m-list'); mList.innerHTML = '<h4 style="margin-bottom:15px;">Manage 🗑️</h4>';
+                s.forEach(x => { const d = x.val();
+                    mList.innerHTML += `<div class="card-modern" style="display:flex; justify-content:space-between; align-items:center; padding:12px 20px; margin-bottom:10px;">
+                        <span>${d.name}</span>
+                        <button onclick="delP('${x.key}')" style="background:none; border:none; font-size:22px;">🗑️</button>
+                    </div>`;
+                });
+            });
+        }
 
-        window.appv = async (k, a) => { await set(ref(db, 'master_data/balance'), bal + a); await remove(ref(db, 'tickets/'+k)); };
-        window.rej = async (k) => await remove(ref(db, 'tickets/'+k));
+        window.delP = async (k) => { if(confirm("Hapus Produk? 🗑️")) await remove(ref(db, 'products/' + k)); };
+
+        window.accTiket = async (uid, amt, key) => {
+            await runTransaction(ref(db, `vortex_users/${uid}/balance`), c => (c || 0) + amt);
+            await remove(ref(db, 'topup_tickets/' + key));
+            showAlert("Saldo Masuk! ✅", "💰");
+        };
+
+        window.previewImg = (input) => {
+            const file = input.files[0]; if(!file) return;
+            const reader = new FileReader(); 
+            document.getElementById('p-label').innerHTML = "<span>Memproses...</span>";
+            reader.onload = (e) => { 
+                const prev = document.getElementById('prev-prod');
+                prev.src = e.target.result;
+                prev.style.display = 'block';
+                document.getElementById('p-label').style.display = 'none';
+            }; 
+            reader.readAsDataURL(file);
+        };
+
+        window.uploadAndPush = async () => {
+            const n = document.getElementById('add-n').value, p = document.getElementById('add-p').value, file = document.getElementById('file-prod').files[0];
+            if(!n || !p || !file) return showAlert("Lengkapi data! 📦");
+            const btn = document.getElementById('btn-publish'); 
+            btn.innerText = "Mengirim... ☁️"; 
+            btn.disabled = true;
+            const fd = new FormData(); 
+            fd.append("image", file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+                const data = await res.json();
+                await push(ref(db, 'products'), { name: n, price: parseInt(p), img: data.data.url });
+                toggleAddPanel();
+                const overlay = document.getElementById('success-overlay');
+                overlay.style.display = 'flex';
+                document.getElementById('add-n').value = '';
+                document.getElementById('add-p').value = '';
+                document.getElementById('file-prod').value = '';
+                document.getElementById('prev-prod').style.display = 'none';
+                document.getElementById('p-label').style.display = 'block';
+                document.getElementById('p-label').innerHTML = '<span style="font-size:40px;">🖼️</span><br><span>Tap to Upload Photo</span>';
+                setTimeout(() => { overlay.style.display = 'none'; }, 2000);
+            } catch(e) { showAlert("Gagal! ❌"); }
+            btn.innerText = "Post to Shop 🚀"; btn.disabled = false;
+        };
+
+        window.toggleAddPanel = () => {
+            const p = document.getElementById('add-panel');
+            p.style.bottom = p.style.bottom === '0px' ? '-100%' : '0px';
+        };
 
         window.nt = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
+            if(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
         };
+
+        onValue(ref(db, 'products'), (s) => {
+            const l = document.getElementById('prod-list'); l.innerHTML = '';
+            s.forEach(x => { const d = x.val();
+                l.innerHTML += `<div class="card-modern" style="padding:10px; margin-bottom:0;">
+                    <img src="${d.img}">
+                    <b style="font-size:13px; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${d.name}</b>
+                    <span style="color:var(--accent); font-weight:800; font-size:12px;">${f(d.price)}</span>
+                </div>`;
+            });
+        });
     </script>
 </body>
 </html>
