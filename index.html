@@ -3,92 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RANZZ STORE | V.164 FIXED</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+    <title>RANZZ NEXUS | V.167 OVERDRIVE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000; --card: #0d0d0d; --border: rgba(255,255,255,0.08);
-            --accent: #007aff; --success: #00ff88; --danger: #ff3b30; --text: #ffffff;
+            --bg: #030303; --card: rgba(20, 20, 20, 0.7); --text: #ffffff;
+            --accent: #007aff; --success: #00ff88; --danger: #ff3b30; --border: rgba(255,255,255,0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
-        
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; font-size: 12px; z-index: 20000; display: none; box-shadow: 0 10px 30px rgba(255,59,48,0.3); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            background: var(--bg); color: var(--text); height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at top right, #001d3d, transparent), radial-gradient(circle at bottom left, #1a0033, transparent);
+        }
 
-        header { padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .money { font-family: 'Space Grotesk', sans-serif; color: var(--success); font-weight: 900; font-size: 20px; }
+        /* ANIMASI LAMPU NEON */
+        @keyframes borderRotate { 0% { border-color: var(--accent); } 50% { border-color: var(--success); } 100% { border-color: var(--accent); } }
 
-        .main-view { height: calc(100vh - 160px); overflow-y: auto; padding: 20px; padding-bottom: 120px; }
-        .page { display: none; } .page.active { display: block; }
+        header { padding: 25px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .db-card { background: var(--card); border-radius: 25px; padding: 18px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 20px; font-weight: 900; width: 100%; cursor: pointer; margin-top: 10px; }
-        .input-box { background: #161616; border: 1px solid var(--border); padding: 18px; border-radius: 18px; color: white; width: 100%; margin-bottom: 15px; outline: none; font-weight: 700; }
+        .main-view { height: calc(100vh - 160px); overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+        .page { display: none; } .page.active { display: block; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        nav { position: fixed; bottom: 25px; left: 20px; right: 20px; background: rgba(15,15,15,0.95); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 35px; display: flex; justify-content: space-around; padding: 18px; z-index: 1000; }
+        /* GLASS CARD */
+        .card { 
+            background: var(--card); backdrop-filter: blur(15px); border-radius: 28px; padding: 22px; 
+            border: 1px solid var(--border); margin-bottom: 18px; transition: 0.3s;
+        }
+        .neon-border { animation: borderRotate 4s infinite; border-width: 2px; }
+
+        .btn { 
+            background: var(--accent); color: white; border: none; padding: 18px; border-radius: 18px; 
+            font-weight: 800; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+        }
+        .btn-acc { background: var(--success); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2); width: 48%; }
+        .btn-cancel { background: var(--danger); box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2); width: 48%; }
+
+        .input-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 18px; 
+            border-radius: 16px; color: white; width: 100%; margin-bottom: 15px; outline: none;
+        }
+
+        /* NAVBAR MODERN */
+        nav { 
+            position: fixed; bottom: 25px; left: 20px; right: 20px; 
+            background: rgba(15,15,15,0.85); backdrop-filter: blur(25px); 
+            border: 1px solid var(--border); border-radius: 35px; 
+            display: flex; justify-content: space-around; padding: 18px; z-index: 1000;
+        }
         .nav-item { font-size: 24px; cursor: pointer; opacity: 0.3; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--accent); transform: scale(1.1); }
-        
-        /* DATABASE TABLE STYLE */
-        .db-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .db-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .nav-item.active { opacity: 1; color: var(--accent); transform: scale(1.2); }
+
+        .copy-tag { font-size: 10px; background: var(--accent); padding: 4px 8px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="toast"></div>
-
     <header>
-        <div style="font-weight:900; font-size:22px;">RANZZ<span>STORE</span></div>
-        <div class="money" id="main-balance">Rp 0</div>
+        <div class="logo">NEXUS<span>STORE</span></div>
+        <div id="main-balance" style="font-weight: 800; color: var(--success); font-family: 'Space Grotesk';">Rp 0</div>
     </header>
 
     <div class="main-view">
         <div id="p-home" class="page active">
-            <h2 style="font-weight:900; margin-bottom:20px;">KATALOG 🏠</h2>
+            <h2 style="margin-bottom: 20px; font-weight: 800;">Flash Sale 🔥</h2>
             <div id="prod-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
         </div>
 
         <div id="p-db" class="page">
-            <h2 style="font-weight:900; margin-bottom:20px;">DATABASE MASTER 📊</h2>
+            <h2 style="margin-bottom: 20px;">Master Hub 📊</h2>
             <div id="depo-requests"></div>
-            <div class="db-card">
-                <table class="db-table"><tbody id="user-body"></tbody></table>
+            <div class="card" style="font-size: 14px;">
+                <h4 style="margin-bottom:10px;">User Monitor</h4>
+                <div id="user-list"></div>
             </div>
         </div>
 
         <div id="p-prof" class="page">
-            <div id="auth-ui" style="text-align:center;">
-                <h2 style="font-weight:900; margin-bottom:20px;">IDENTITY GATE</h2>
-                <input type="text" id="l-user" class="input-box" placeholder="USERNAME">
-                <input type="password" id="l-pass" class="input-box" placeholder="PASSWORD">
-                <button class="btn" onclick="auth('LOGIN')">LOG IN</button>
-                <button class="btn" style="background:transparent; border:1px solid var(--border)" onclick="auth('REG')">DAFTAR</button>
+            <div id="auth-ui" class="card neon-border">
+                <h2 style="text-align: center; margin-bottom: 25px;">Sistem Akses</h2>
+                <input type="text" id="l-user" class="input-box" placeholder="Username">
+                <input type="password" id="l-pass" class="input-box" placeholder="Password">
+                <button class="btn" onclick="handleAuth('LOGIN')">MASUK</button>
+                <button class="btn" style="background:transparent; border:1px solid var(--accent); margin-top:10px;" onclick="handleAuth('REG')">DAFTAR AKUN</button>
             </div>
-            <div id="user-ui" style="display:none; text-align:center;">
-                <div style="width:80px; height:80px; background:var(--accent); border-radius:20px; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:30px;">👤</div>
-                <h2 id="hello-user" style="font-weight:900; margin-bottom:10px;">-</h2>
-                <button class="btn" style="background:var(--danger)" onclick="logout()">LOGOUT</button>
+            <div id="user-ui" style="display:none;">
+                <div class="card neon-border" style="text-align: center;">
+                    <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
+                    <h2 id="u-name-display" style="letter-spacing: 1px;">-</h2>
+                    <p style="opacity: 0.5; font-size: 12px; margin-top: 5px;">Loyalty Level: Premium Member</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 15px;">Keamanan Akun</h4>
+                    <input type="password" id="new-pw" class="input-box" placeholder="Password Baru">
+                    <button class="btn" onclick="changePW()">UPDATE PASSWORD</button>
+                    <button class="btn" style="background: var(--danger); margin-top: 20px;" onclick="logout()">KELUAR SISTEM</button>
+                </div>
             </div>
         </div>
     </div>
 
     <nav>
-        <div class="nav-item active" onclick="nt('p-home', this)">🏠</div> 
-        <div class="nav-item" onclick="handleDepoClick()">💸</div> 
-        <div id="nav-admin-tools" style="display:contents;"></div> 
-        <div class="nav-item" id="nav-prof-btn" onclick="nt('p-prof', this)">👤</div> 
+        <div class="nav-item active" onclick="nt('p-home', this)">🏠</div>
+        <div class="nav-item" onclick="openDepo()">💸</div>
+        <div id="owner-nav" style="display: contents;"></div>
+        <div class="nav-item" id="prof-nav" onclick="nt('p-prof', this)">👤</div>
     </nav>
 
-    <div id="m-depo" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:10000; padding:25px;">
-        <div class="db-card" style="width:100%; max-width:400px; text-align:center;">
-            <h3 style="margin-bottom:15px; font-weight:900;">ISI SALDO 💸</h3>
-            <div class="input-box" style="text-align:left; font-size:12px; background:rgba(0,122,255,0.1); border-color:var(--accent);">
-                DANA: 08123456789 (RANZZ)<br>GOPAY: 08123456789 (RANZZ)
+    <div id="m-depo" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:10000; padding:25px;">
+        <div class="card neon-border" style="width: 100%; max-width: 400px; text-align: center;">
+            <h3 style="margin-bottom: 20px;">Isi Saldo 💸</h3>
+            <div class="input-box" style="text-align: left; font-size: 13px; line-height: 1.8; border-color: var(--accent);">
+                DANA: <b>08123456789</b> <span class="copy-tag" onclick="copy('08123456789')">COPY</span><br>
+                GOPAY: <b>08123456789</b> <span class="copy-tag" onclick="copy('08123456789')">COPY</span>
             </div>
-            <input type="number" id="d-amt" class="input-box" placeholder="NOMINAL (MIN 10000)">
-            <button class="btn" onclick="subDepo()">KONFIRMASI</button>
-            <button class="btn" style="background:none" onclick="closeModal('m-depo')">KEMBALI</button>
+            <input type="number" id="d-amt" class="input-box" placeholder="Nominal (Min 10.000)">
+            <button class="btn" onclick="submitDepo()">KONFIRMASI TRANSFER</button>
+            <button class="btn" style="background:none; box-shadow:none;" onclick="closeModal()">KEMBALI</button>
         </div>
     </div>
 
@@ -99,101 +132,90 @@
         const conf = { databaseURL: "https://flutter-ai-playground-e9460-default-rtdb.asia-southeast1.firebasedatabase.app" };
         const app = initializeApp(conf);
         const db = getDatabase(app);
-        
-        // Ganti kunci session agar fresh
-        let user = JSON.parse(localStorage.getItem('ranzz_session_v164'));
+        let user = JSON.parse(localStorage.getItem('ranzz_nexus_session'));
 
-        // --- AUTH SYSTEM FIXED ---
-        window.auth = async (mode) => {
-            const u = document.getElementById('l-user').value.trim();
-            const p = document.getElementById('l-pass').value;
-            if(!u || !p) return alert("ISI SEMUA KOLOM!");
+        window.copy = (t) => { navigator.clipboard.writeText(t); alert("Nomor Tersalin! ✅"); };
 
-            const uRef = ref(db, 'vortex_users/' + u);
-            const snap = await get(uRef);
-
-            if(mode === 'LOGIN') {
-                if(snap.exists() && snap.val().password === p) {
-                    localStorage.setItem('ranzz_session_v164', JSON.stringify(snap.val()));
-                    alert("LOGIN BERHASIL!");
-                    location.reload();
-                } else {
-                    alert("USER ATAU PASSWORD SALAH!");
-                }
+        window.handleAuth = async (m) => {
+            const u = document.getElementById('l-user').value.trim(), p = document.getElementById('l-pass').value;
+            if(!u || !p) return alert("Lengkapi data!");
+            const r = ref(db, 'nexus_users/'+u), s = await get(r);
+            if(m==='LOGIN'){
+                if(s.exists() && s.val().password === p){ localStorage.setItem('ranzz_nexus_session', JSON.stringify(s.val())); location.reload(); }
+                else alert("Username/Password Salah!");
             } else {
-                if(snap.exists()) return alert("USERNAME SUDAH ADA!");
-                const newU = { username: u, password: p, balance: 0, role: u === "Ranzz_Own" ? "OWNER" : "MEMBER" };
-                await set(uRef, newU);
-                alert("DAFTAR SUKSES! SILAKAN LOGIN.");
+                if(s.exists()) return alert("Username sudah terdaftar!");
+                await set(r, {username:u, password:p, balance:0}); alert("Sukses Daftar! Silakan Login.");
             }
         };
 
-        // --- SESSION RENDER ---
-        if(user) {
+        if(user){
             document.getElementById('auth-ui').style.display = 'none';
             document.getElementById('user-ui').style.display = 'block';
-            document.getElementById('hello-user').innerText = user.username.toUpperCase();
-            
-            onValue(ref(db, `vortex_users/${user.username}/balance`), s => {
+            document.getElementById('u-name-display').innerText = user.username.toUpperCase();
+            onValue(ref(db, `nexus_users/${user.username}/balance`), s => {
                 document.getElementById('main-balance').innerText = "Rp " + (s.val() || 0).toLocaleString();
             });
-
-            if(user.username === "Ranzz_Own") {
-                document.getElementById('nav-admin-tools').innerHTML = `<div class="nav-item" onclick="nt('p-db', this)">📊</div>`;
+            if(user.username === "Ranzz_Own"){
+                document.getElementById('owner-nav').innerHTML = `<div class="nav-item" onclick="nt('p-db', this)">📊</div>`;
                 initOwner();
             }
         }
 
-        function initOwner() {
-            onValue(ref(db, 'vortex_users'), s => {
-                const b = document.getElementById('user-body'); b.innerHTML = "";
-                s.forEach(u => {
-                    const d = u.val();
-                    b.innerHTML += `<tr><td><b>${d.username}</b></td><td style="text-align:right">Rp ${d.balance.toLocaleString()}</td></tr>`;
-                });
+        function initOwner(){
+            onValue(ref(db, 'nexus_users'), s => {
+                const l = document.getElementById('user-list'); l.innerHTML = "";
+                s.forEach(u => { l.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);"><span>${u.val().username}</span><b>Rp ${u.val().balance.toLocaleString()}</b></div>`; });
             });
-            onValue(ref(db, 'depo_requests'), s => {
-                const dBox = document.getElementById('depo-requests'); dBox.innerHTML = "";
-                s.forEach(r => {
+            onValue(ref(db, 'nexus_depo'), s => {
+                const d = document.getElementById('depo-requests'); d.innerHTML = "";
+                s.forEach(r => { 
                     const v = r.val();
-                    dBox.innerHTML += `<div class="db-card" style="border-left:4px solid var(--success)">
-                        ${v.username} Minta Rp ${v.amount.toLocaleString()} 
-                        <button onclick="acc('${r.key}','${v.username}',${v.amount})" style="float:right; background:var(--success); border:none; padding:5px 10px; border-radius:10px; font-weight:900;">ACC</button>
-                    </div>`;
+                    d.innerHTML += `<div class="card" style="border-left:5px solid var(--accent)">
+                        <small>Permintaan Saldo:</small><br>
+                        <b>${v.user}</b> <span style="color:var(--success)">+Rp ${v.amt.toLocaleString()}</span>
+                        <div style="display:flex; justify-content:space-between; margin-top:15px;">
+                            <button class="btn btn-acc" onclick="manageDepo('${r.key}','${v.user}',${v.amt},'ACC')">TERIMA</button>
+                            <button class="btn btn-cancel" onclick="manageDepo('${r.key}','${v.user}',${v.amt},'CANCEL')">TOLAK</button>
+                        </div>
+                    </div>`; 
                 });
             });
         }
 
-        window.acc = async (k, u, a) => {
-            const r = ref(db, `vortex_users/${u}`);
-            const s = await get(r);
-            await update(r, { balance: (s.val().balance || 0) + a });
-            await remove(ref(db, `depo_requests/${k}`));
-            alert("BERHASIL ACC!");
+        window.manageDepo = async (id, u, a, action) => {
+            if(action === 'ACC') {
+                const r = ref(db, `nexus_users/${u}`);
+                const s = await get(r);
+                await update(r, { balance: (s.val().balance || 0) + a });
+                alert("Saldo Berhasil Ditambahkan! ✅");
+            } else {
+                alert("Permintaan Ditolak! ❌");
+            }
+            await remove(ref(db, `nexus_depo/${id}`));
         };
 
-        // --- UI HELPERS ---
         window.nt = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         };
-        window.handleDepoClick = () => {
-            if(!user) {
-                alert("LOGIN DULU BOS!");
-                nt('p-prof', document.getElementById('nav-prof-btn'));
-            } else document.getElementById('m-depo').style.display = 'flex';
-        };
-        window.subDepo = async () => {
+        window.openDepo = () => { if(!user) alert("Login dulu!"); else document.getElementById('m-depo').style.display = 'flex'; };
+        window.closeModal = () => document.getElementById('m-depo').style.display = 'none';
+        window.submitDepo = async () => {
             const a = parseInt(document.getElementById('d-amt').value);
-            if(a < 10000 || isNaN(a)) return alert("MINIMAL 10.000!");
-            await push(ref(db, 'depo_requests'), { username: user.username, amount: a });
-            alert("REQ TERKIRIM!");
-            document.getElementById('m-depo').style.display = 'none';
+            if(a < 10000) return alert("Minimal pengisian Rp 10.000!");
+            await push(ref(db, 'nexus_depo'), { user: user.username, amt: a });
+            alert("Permintaan Terkirim! Mohon tunggu konfirmasi Owner."); closeModal();
         };
-        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.logout = () => { localStorage.clear(); location.reload(); };
+        window.changePW = async () => {
+            const n = document.getElementById('new-pw').value;
+            if(!n) return alert("Isi password baru!");
+            await update(ref(db, `nexus_users/${user.username}`), { password: n });
+            alert("Password berhasil diubah!");
+        };
     </script>
 </body>
 </html>
